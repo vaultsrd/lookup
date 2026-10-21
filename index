@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chain Lookup Studio — Dark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+/* =========================================================
+   DESIGN TOKENS — Corona Free Admin dark palette
+   ========================================================= */
+:root{
+  --bg:#000000;
+  --surface:#191c24;
+  --surface-2:#2A3038;
+  --surface-3:#0f1117;
+  --border:#2c2e33;
+  --zebra-odd:#191c24;
+  --zebra-even:#000000;
+
+  --text:#ffffff;
+  --text-soft:#d7dae2;
+  --muted:#6c7293;
+
+  --primary:#0090e7;
+  --success:#00d25b;
+  --warning:#ffab00;
+  --danger:#fc424a;
+  --info:#8f5fe8;
+
+  --radius:8px;
+  --shadow:0 18px 40px -24px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Roboto',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+[id]{scroll-margin-top:24px}
+button,input,select,label{font-family:inherit}
+
+/* generic icon */
+.ico{width:16px;height:16px;flex:none;stroke-width:2;display:block}
+.ico.lg{width:20px;height:20px}
+.ico.xl{width:26px;height:26px}
+
+/* =========================================================
+   APP SHELL — full width, no sidebar / no topbar
+   ========================================================= */
+.app{
+  width:100%;
+  max-width:none;
+  margin:0;
+  padding:26px 26px 40px;
+  min-height:100vh;
+}
+@media(max-width:700px){ .app{padding:18px 14px 32px} }
+
+/* =========================================================
+   PAGE HEAD
+   ========================================================= */
+.page-head{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:16px; flex-wrap:wrap; margin-bottom:22px;
+}
+.page-head-left{display:flex; align-items:center; gap:13px; min-width:0}
+.brand-mark{
+  width:42px;height:42px;flex:none;border-radius:10px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,#0090e7,#8f5fe8);
+  box-shadow:0 10px 22px -12px rgba(0,144,231,.95);
+}
+.page-title{margin:0 0 3px; font-size:21px; font-weight:700; letter-spacing:.2px}
+.page-sub{margin:0; color:var(--muted); font-size:13px}
+.page-actions{display:flex; gap:9px; flex-wrap:wrap}
+
+/* =========================================================
+   STAT CARDS
+   ========================================================= */
+.stat-grid{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr));
+  gap:16px; margin-bottom:20px;
+}
+.stat-card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:18px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+  transition:border-color .18s;
+}
+.stat-card:hover{border-color:#3a3e46}
+.stat-label{
+  margin:0 0 7px; font-size:11px; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--muted);
+}
+.stat-value{margin:0 0 7px; font-size:25px; font-weight:700; line-height:1; letter-spacing:-.4px}
+.stat-sub{margin:0; font-size:11.5px; color:var(--muted); display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.stat-icon{
+  width:48px;height:48px;flex:none;border-radius:var(--radius);display:grid;place-items:center;
+  background:rgba(0,144,231,.12); color:var(--primary);
+}
+.stat-icon.green{background:rgba(0,210,91,.12); color:var(--success)}
+.stat-icon.amber{background:rgba(255,171,0,.12); color:var(--warning)}
+.stat-icon.violet{background:rgba(143,95,232,.12); color:var(--info)}
+
+/* =========================================================
+   COLUMNS — proporsional, tidak "pendek"
+   ========================================================= */
+.cols{
+  display:grid;
+  grid-template-columns:minmax(300px, 26%) minmax(0,1fr);
+  gap:18px;
+  align-items:start;
+}
+@media(max-width:1100px){ .cols{grid-template-columns:1fr} }
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+.card{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); overflow:hidden; margin-bottom:18px;
+}
+.card-head{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:15px 18px; border-bottom:1px solid var(--border); flex-wrap:wrap;
+}
+.card-title{
+  margin:0; font-size:14.5px; font-weight:600; display:flex; align-items:center; gap:9px;
+  letter-spacing:.2px;
+}
+.card-title .num{
+  width:23px;height:23px;flex:none;border-radius:6px;display:grid;place-items:center;
+  background:rgba(0,144,231,.14); color:var(--primary); font-size:11.5px; font-weight:700;
+}
+.card-title .ico{color:var(--muted)}
+.card-head .ico{color:var(--muted)}
+.card-body{padding:18px}
+.head-tools{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.head-tools .btn{margin:0}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+.search{position:relative}
+.search input{
+  width:100%; padding:9px 12px 9px 38px; border-radius:var(--radius);
+  background:var(--surface-2); border:1px solid var(--border); color:#fff; font-size:13px;
+  outline:none; transition:.15s;
+}
+.search input::placeholder{color:var(--muted)}
+.search input:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,144,231,.2)}
+.search .search-ico{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted)}
+.search.sm input{width:200px; padding:7px 11px 7px 32px; font-size:12.5px}
+.search.sm .search-ico{left:10px}
+.search.sm .ico{width:14px;height:14px}
+
+/* =========================================================
+   DROPZONE
+   ========================================================= */
+.dropzone{
+  display:block; border:1px dashed var(--border); border-radius:var(--radius);
+  background:var(--surface-3); padding:26px 16px; text-align:center;
+  cursor:pointer; transition:.18s; color:var(--muted);
+}
+.dropzone:hover{border-color:var(--primary); background:rgba(0,144,231,.06)}
+.dropzone .big{display:grid; place-items:center; margin-bottom:10px; color:var(--primary)}
+.dropzone b{color:#fff}
+.dropzone small{display:block; margin-top:6px; font-size:11.5px; color:var(--muted)}
+body.dragging .dropzone{border-color:var(--primary); background:rgba(0,144,231,.1)}
+body.dragging::after{
+  content:"Lepaskan file di sini"; position:fixed; inset:0; z-index:100;
+  display:grid; place-items:center; font-size:20px; font-weight:700; color:#fff;
+  background:rgba(0,0,0,.78); backdrop-filter:blur(3px); pointer-events:none;
+}
+
+/* =========================================================
+   TABLES LIST
+   ========================================================= */
+.tables-list{
+  display:flex; flex-direction:column; gap:6px;
+  max-height:60vh; overflow:auto; padding:10px;
+}
+.table-item{
+  display:flex; gap:10px; align-items:center; padding:10px; border-radius:var(--radius);
+  border:1px solid transparent; cursor:pointer; transition:.15s;
+}
+.table-item:hover{background:var(--surface-3)}
+.table-item.active{background:rgba(0,144,231,.1); border-color:rgba(0,144,231,.35)}
+.table-icon{
+  width:30px;height:30px;flex:none;border-radius:7px;display:grid;place-items:center;
+  background:var(--surface-2); color:var(--primary);
+}
+.table-info{min-width:0; flex:1}
+.table-name{font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.table-sub{font-size:11px; color:var(--muted); margin-top:2px}
+.table-actions{display:flex; gap:2px; opacity:.5; transition:opacity .15s}
+.table-item:hover .table-actions{opacity:1}
+
+/* =========================================================
+   STEPS
+   ========================================================= */
+.step{
+  display:flex; flex-direction:column; gap:12px; padding:14px; margin-bottom:10px;
+  background:var(--surface-3); border:1px solid var(--border); border-radius:var(--radius);
+}
+.step-top{display:flex; align-items:center; gap:10px}
+.step-num{
+  width:26px;height:26px;flex:none;border-radius:7px;display:grid;place-items:center;
+  background:rgba(0,144,231,.14); color:var(--primary); font-size:12px; font-weight:700;
+}
+.step-title{font-size:12.5px; font-weight:700; letter-spacing:.3px}
+.step-top .icon-btn{margin-left:auto}
+.step-fields{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:11px}
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+label.field, .step-fields label{
+  display:flex; flex-direction:column; gap:6px; font-size:10.5px; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+}
+select, input[type=text], input[type=number], input[type=search]{
+  width:100%; font-family:inherit; font-size:13px; font-weight:500; color:#fff;
+  background-color:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:9px 11px; outline:none; transition:border-color .15s, box-shadow .15s;
+}
+select{
+  appearance:none; padding-right:30px; cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c7293' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 11px center;
+}
+select option{background:var(--surface); color:#fff}
+select:focus, input:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,144,231,.2)}
+select:disabled, input:disabled{opacity:.45; cursor:not-allowed}
+input::placeholder{color:var(--muted)}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+.btn{
+  display:inline-flex; align-items:center; gap:7px; padding:9px 15px; border-radius:var(--radius);
+  border:1px solid transparent; font-size:13px; font-weight:600; cursor:pointer;
+  white-space:nowrap; transition:background .15s, color .15s, border-color .15s, filter .15s;
+  text-decoration:none;
+}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.btn.primary{background:var(--primary); color:#fff}
+.btn.primary:hover{filter:brightness(1.12)}
+.btn.outline{background:transparent; border-color:var(--border); color:var(--text-soft)}
+.btn.outline:hover{background:var(--surface-2); color:#fff; border-color:#3a3e46}
+.btn.sm{padding:6px 11px; font-size:12px; border-radius:7px}
+
+/* --- tombol unduh --- */
+.btn.csv{
+  background-color:#8f5fe8;
+  border-color:#8f5fe8;
+  color:#ffffff;
+}
+.btn.csv:hover{filter:brightness(1.1)}
+.btn.excel{
+  background-color:#00d25b;
+  border-color:#00d25b;
+  color:#ffffff;
+}
+.btn.excel:hover{filter:brightness(1.08)}
+
+.icon-btn{
+  display:inline-grid; place-items:center; width:36px; height:36px; border-radius:var(--radius);
+  border:1px solid transparent; background:transparent; color:var(--muted);
+  cursor:pointer; transition:.15s; position:relative;
+}
+.icon-btn:hover{background:var(--surface-2); color:#fff}
+.icon-btn.sm{width:30px; height:30px}
+.icon-btn.danger:hover{background:rgba(252,66,74,.14); color:var(--danger)}
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+.badge{
+  display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:999px;
+  font-size:11px; font-weight:700; letter-spacing:.03em; white-space:nowrap;
+}
+.badge-primary{background:rgba(0,144,231,.16); color:#4dc0ff}
+.badge-success{background:rgba(0,210,91,.16); color:#3ee68a}
+.badge-warning{background:rgba(255,171,0,.16); color:#ffc247}
+.badge-danger{background:rgba(252,66,74,.16); color:#ff8189}
+.badge-info{background:rgba(143,95,232,.18); color:#b393f5}
+.badge-muted{background:var(--surface-2); color:#9aa1b5}
+
+/* =========================================================
+   DATA TABLES — zebra grey/black + dark border-top
+   ========================================================= */
+.table-wrap{
+  overflow:auto; border:1px solid var(--border); border-radius:var(--radius); max-height:62vh;
+  background:#000000;
+}
+table{border-collapse:collapse; width:100%; font-size:12.5px; white-space:nowrap}
+thead th{
+  position:sticky; top:0; z-index:2; background:var(--surface-3); color:var(--muted);
+  text-align:left; padding:10px 13px; font-size:10.5px; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase; border-bottom:1px solid #2c2e33;
+}
+tbody td{
+  padding:9px 13px; color:var(--text-soft);
+  border-top:1px solid #2c2e33;
+  background:var(--zebra-odd);
+}
+tbody tr:nth-child(even) td{ background:var(--zebra-even) }
+tbody tr:hover td{ background:var(--surface-2) }
+td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-variant-numeric:tabular-nums}
+
+/* =========================================================
+   MISC
+   ========================================================= */
+.stats, .step-stats{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:13px}
+.hint{font-size:12px; color:var(--muted); line-height:1.7; margin:0 0 14px}
+.empty{color:var(--muted); text-align:center; padding:28px 12px; font-size:13px; line-height:1.8}
+.empty.small{padding:16px 10px; font-size:12.5px}
+.empty b{color:var(--text-soft)}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+@media(max-width:640px){ .grid-2{grid-template-columns:1fr} }
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+.modal{
+  position:fixed; inset:0; z-index:120; display:none; align-items:center; justify-content:center;
+  padding:24px; background:rgba(0,0,0,.75); backdrop-filter:blur(2px);
+}
+.modal.open{display:flex}
+.modal-box{
+  width:min(1150px,100%); max-height:86vh; display:flex; flex-direction:column;
+  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  overflow:hidden; box-shadow:0 40px 90px -30px #000;
+}
+.modal-head{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:14px 18px; border-bottom:1px solid var(--border);
+}
+.modal-head h3{margin:0; font-size:14px; font-weight:600}
+.modal-body{padding:16px 18px; overflow:auto}
+.modal-body .table-wrap{max-height:none}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+.toast{
+  position:fixed; left:50%; bottom:26px; z-index:200;
+  transform:translateX(-50%) translateY(16px);
+  background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--primary);
+  color:#fff; padding:12px 20px; border-radius:var(--radius); font-size:13px;
+  box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:.25s; max-width:90vw;
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+/* Scrollbars */
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#31353d; border-radius:9px}
+::-webkit-scrollbar-thumb:hover{background:#3d424b}
+
+@media(max-width:900px){
+  .stat-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ==================== PAGE HEAD ==================== -->
+  <header class="page-head">
+    <div class="page-head-left">
+      <span class="brand-mark" data-ico="link" data-ico-class="lg"></span>
+      <div>
+        <h1 class="page-title">Chain Lookup Studio</h1>
+        <p class="page-sub">Multi-step VLOOKUP lintas sheet Excel — pencocokan persis, mengandung, dan bertingkat.</p>
+      </div>
+    </div>
+    <div class="page-actions">
+      <label class="btn primary">
+        <span data-ico="plus"></span> Tambah File
+        <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.xlsm,.csv" hidden>
+      </label>
+      <button class="btn outline" id="btnReset"><span data-ico="refresh"></span> Reset</button>
+    </div>
+  </header>
+
+  <!-- ==================== KPI ==================== -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div>
+        <p class="stat-label">Tables Loaded</p>
+        <h3 class="stat-value" id="statTables">0</h3>
+        <p class="stat-sub" id="statTablesSub">Belum ada file</p>
+      </div>
+      <div class="stat-icon"><span data-ico="database" data-ico-class="lg"></span></div>
+    </div>
+
+    <div class="stat-card">
+      <div>
+        <p class="stat-label">Source Rows</p>
+        <h3 class="stat-value" id="statRows">0</h3>
+        <p class="stat-sub" id="statRowsSub">Pilih tabel sumber</p>
+      </div>
+      <div class="stat-icon green"><span data-ico="rows" data-ico-class="lg"></span></div>
+    </div>
+
+    <div class="stat-card">
+      <div>
+        <p class="stat-label">Chain Steps</p>
+        <h3 class="stat-value" id="statSteps">0</h3>
+        <p class="stat-sub" id="statStepsSub">Belum ada langkah</p>
+      </div>
+      <div class="stat-icon violet"><span data-ico="link" data-ico-class="lg"></span></div>
+    </div>
+
+    <div class="stat-card">
+      <div>
+        <p class="stat-label">Match Rate</p>
+        <h3 class="stat-value" id="statMatch">—</h3>
+        <p class="stat-sub" id="statMatchSub">Belum dijalankan</p>
+      </div>
+      <div class="stat-icon amber"><span data-ico="activity" data-ico-class="lg"></span></div>
+    </div>
+  </div>
+
+  <!-- ==================== COLUMNS ==================== -->
+  <div class="cols">
+
+    <!-- LEFT -->
+    <div>
+      <section class="card" id="card-upload">
+        <div class="card-head"><h2 class="card-title"><span data-ico="upload"></span> Upload Data</h2></div>
+        <div class="card-body">
+          <label class="dropzone" id="dropzone">
+            <span class="big" data-ico="upload" data-ico-class="xl"></span>
+            <div><b>Drag &amp; drop</b> file Excel di sini</div>
+            <small>atau klik untuk memilih · .xlsx .xls .xlsm .csv</small>
+          </label>
+        </div>
+      </section>
+
+      <section class="card" id="card-tables">
+        <div class="card-head">
+          <h2 class="card-title"><span data-ico="table"></span> Tabel Terdeteksi</h2>
+          <div class="head-tools">
+            <div class="search sm">
+              <span class="search-ico" data-ico="search"></span>
+              <input id="tableSearch" type="search" placeholder="Cari tabel…" autocomplete="off">
+            </div>
+            <span class="badge badge-muted" id="tablesCount">0</span>
+          </div>
+        </div>
+        <div class="tables-list" id="tablesList"></div>
+      </section>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <!-- 1. Sumber -->
+      <section class="card" id="card-source">
+        <div class="card-head">
+          <h2 class="card-title"><span class="num">1</span> Sumber Data</h2>
+        </div>
+        <div class="card-body">
+          <div class="grid-2">
+            <label class="field">Tabel sumber
+              <select id="sourceTable"></select>
+            </label>
+            <p class="hint" style="margin:0; align-self:end;">
+              Kolom kunci diatur <b>per langkah</b> di bagian Rantai Lookup — tiap langkah boleh memakai
+              kolom kunci berbeda, baik dari tabel sumber maupun dari hasil langkah sebelumnya.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Chain -->
+      <section class="card" id="card-chain">
+        <div class="card-head">
+          <h2 class="card-title"><span class="num">2</span> Rantai Lookup</h2>
+          <button class="btn primary sm" id="btnAddStep"><span data-ico="plus"></span> Tambah Langkah</button>
+        </div>
+        <div class="card-body">
+          <p class="hint">
+            Setiap langkah bisa memakai <b>kolom kunci berbeda</b>. Nilai yang dicari dapat berasal dari
+            <b>kolom tabel sumber</b> (bebas) atau dari <b>hasil langkah sebelumnya</b>.<br>
+            <b>Persis</b> = nilai harus sama; <b>Kunci mengandung nilai</b> = sel tabel tujuan memuat nilai dicari;
+            <b>Nilai mengandung kunci</b> = nilai dicari memuat sel tabel tujuan.<br>
+            Pencocokan mengabaikan spasi berlebih &amp; huruf besar/kecil, dan mengambil baris pertama yang cocok.
+          </p>
+          <div id="steps"></div>
+        </div>
+      </section>
+
+      <!-- 3. Hasil -->
+      <section class="card" id="card-result">
+        <div class="card-head">
+          <h2 class="card-title"><span class="num">3</span> Hasil</h2>
+          <div class="head-tools">
+            <select id="displayLimit" style="width:auto" title="Jumlah baris ditampilkan">
+              <option value="100">Tampil 100</option>
+              <option value="500" selected>Tampil 500</option>
+              <option value="2000">Tampil 2000</option>
+              <option value="0">Tampil semua</option>
+            </select>
+            <button class="btn primary sm" id="btnRun"><span data-ico="play"></span> Jalankan Lookup</button>
+            <button class="btn csv sm" id="btnCSV"><span data-ico="download"></span> CSV</button>
+            <button class="btn excel sm" id="btnXLSX"><span data-ico="download"></span> Excel</button>
+          </div>
+        </div>
+        <div class="card-body" id="resultArea"></div>
+      </section>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== MODAL PREVIEW ==================== -->
+<div class="modal" id="modal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">Pratinjau</h3>
+      <button class="btn outline sm" id="modalClose"><span data-ico="x"></span> Tutup</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   0. INLINE ICON SET (tanpa dependensi eksternal)
+   ========================================================= */
+const ICONS = {
+  database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
+  rows:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  activity:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  play:'<polygon points="6 3 20 12 6 21 6 3" fill="currentColor" stroke="none"/>',
+  eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  table:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
+  refresh:'<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>'
+};
+
+function icon(name, cls){
+  const path = ICONS[name] || '';
+  return `<svg class="ico ${cls || ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+}
+
+function hydrateIcons(root){
+  (root || document).querySelectorAll('[data-ico]').forEach(el => {
+    if (el.dataset.icoDone) return;
+    el.innerHTML = icon(el.dataset.ico, el.dataset.icoClass || '');
+    el.dataset.icoDone = '1';
+  });
+}
+
+/* =========================================================
+   1. STATE
+   ========================================================= */
+let uidCounter = 0;
+const nid = p => `${p}_${++uidCounter}`;
+
+const state = {
+  tables: [],          // { id, fileName, sheetName, headers[], rows[] }
+  sourceTableId: '',
+  steps: [],           // { id, tableId, keySource, sourceCol, keyCol, returnCol, alias, matchMode }
+  result: null,        // { headers, rows, total, fullMatch, stepStats[] }
+  displayLimit: 500,
+  tableFilter: ''
+};
+
+/* =========================================================
+   2. UTILITAS
+   ========================================================= */
+const $ = sel => document.querySelector(sel);
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function fmt(v){
+  if (v === null || v === undefined || v === '') return '';
+  if (v instanceof Date){
+    const p = n => String(n).padStart(2,'0');
+    return `${v.getFullYear()}-${p(v.getMonth()+1)}-${p(v.getDate())}`;
+  }
+  return String(v);
+}
+
+function normKey(v){
+  if (v === null || v === undefined) return '';
+  if (v instanceof Date) return String(v.getTime());
+  return String(v).replace(/\s+/g,' ').trim().toLowerCase();
+}
+
+const getTable = id => state.tables.find(t => t.id === id);
+
+let toastTimer;
+function toast(msg){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+function uniqueName(base, used){
+  let name = base, i = 2;
+  while (used.has(name)) name = `${base} (${i++})`;
+  used.add(name);
+  return name;
+}
+
+function stamp(){
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+function download(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+/* =========================================================
+   3. PARSING FILE EXCEL / CSV
+   ========================================================= */
+function buildTable(fileName, sheetName, aoa){
+  const rows = aoa.filter(r => Array.isArray(r) &&
+    r.some(c => c !== null && c !== undefined && c !== ''));
+
+  if (!rows.length) return null;
+
+  const headerRow = rows[0];
+  const maxCols = rows.reduce((m, r) => Math.max(m, r.length), 0);
+
+  const headers = [];
+  const counter = new Map();
+  for (let i = 0; i < maxCols; i++){
+    let h = String(headerRow[i] ?? '').trim() || `Kolom ${i+1}`;
+    const c = counter.get(h) || 0;
+    counter.set(h, c + 1);
+    if (c > 0) h = `${h} (${c + 1})`;
+    headers.push(h);
+  }
+
+  const data = [];
+  for (let i = 1; i < rows.length; i++){
+    const obj = {};
+    headers.forEach((h, idx) => { obj[h] = rows[i][idx] ?? null; });
+    data.push(obj);
+  }
+
+  return { id: nid('tbl'), fileName, sheetName, headers, rows: data };
+}
+
+async function handleFiles(fileList){
+  const files = Array.from(fileList).filter(f => /\.(xlsx|xls|xlsm|csv)$/i.test(f.name));
+  if (!files.length){ toast('Format file tidak didukung.'); return; }
+
+  let added = 0;
+
+  for (const file of files){
+    try {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: 'array', cellDates: true });
+
+      wb.SheetNames.forEach(sheetName => {
+        const ws = wb.Sheets[sheetName];
+        const aoa = XLSX.utils.sheet_to_json(ws, {
+          header: 1, defval: null, raw: true, blankrows: false
+        });
+        const tbl = buildTable(file.name, sheetName, aoa);
+        if (tbl){ state.tables.push(tbl); added++; }
+      });
+    } catch (err){
+      console.error(err);
+      toast(`Gagal membaca "${file.name}"`);
+    }
+  }
+
+  if (added){
+    if (!state.sourceTableId || !getTable(state.sourceTableId)){
+      state.sourceTableId = state.tables[0].id;
+    }
+    syncSourceCols();
+    state.result = null;
+    renderAll();
+    renderResult();
+    toast(`${added} tabel berhasil dimuat.`);
+  } else {
+    toast('Tidak ada data yang bisa dibaca.');
+  }
+}
+
+/* =========================================================
+   4. SINKRONISASI KOLOM SUMBER → STEP
+   ========================================================= */
+function syncSourceCols(){
+  const src = getTable(state.sourceTableId);
+  const headers = src ? src.headers : [];
+  state.steps.forEach(s => {
+    if (s.keySource === 'source'){
+      if (!headers.includes(s.sourceCol)) s.sourceCol = headers[0] || '';
+    }
+  });
+}
+
+/* =========================================================
+   5. RENDER STAT CARDS
+   ========================================================= */
+function renderStats(){
+  const src = getTable(state.sourceTableId);
+  const files = new Set(state.tables.map(t => t.fileName));
+  const r = state.result;
+
+  $('#statTables').textContent = state.tables.length;
+  $('#statTablesSub').innerHTML = state.tables.length
+    ? `<span class="badge badge-info">${files.size} file</span> ${state.tables.length} sheet`
+    : 'Belum ada file';
+
+  $('#statRows').textContent = src ? src.rows.length : 0;
+  $('#statRowsSub').innerHTML = src
+    ? `${esc(src.sheetName)} · ${src.headers.length} kolom`
+    : 'Pilih tabel sumber';
+
+  $('#statSteps').textContent = state.steps.length;
+  $('#statStepsSub').textContent = state.steps.length ? 'Langkah rantai aktif' : 'Belum ada langkah';
+
+  if (r && r.total){
+    const pct = Math.round(r.fullMatch / r.total * 100);
+    const tone = pct >= 100 ? 'badge-success' : pct > 0 ? 'badge-warning' : 'badge-danger';
+    $('#statMatch').textContent = pct + '%';
+    $('#statMatchSub').innerHTML = `<span class="badge ${tone}">${r.fullMatch}/${r.total}</span> cocok penuh`;
+  } else {
+    $('#statMatch').textContent = '—';
+    $('#statMatchSub').textContent = 'Belum dijalankan';
+  }
+}
+
+/* =========================================================
+   6. RENDER DAFTAR TABEL
+   ========================================================= */
+function renderTables(){
+  const el = $('#tablesList');
+  const q = state.tableFilter.trim().toLowerCase();
+
+  const list = q
+    ? state.tables.filter(t =>
+        `${t.fileName} ${t.sheetName}`.toLowerCase().includes(q))
+    : state.tables;
+
+  $('#tablesCount').textContent = state.tables.length;
+
+  if (!state.tables.length){
+    el.innerHTML = `<div class="empty small">Belum ada data.<br><b>Drag &amp; drop</b> file Excel di atas.</div>`;
+    return;
+  }
+
+  if (!list.length){
+    el.innerHTML = `<div class="empty small">Tidak ada tabel yang cocok dengan <b>"${esc(state.tableFilter)}"</b>.</div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(t => `
+    <div class="table-item ${t.id === state.sourceTableId ? 'active' : ''}" data-id="${t.id}">
+      <div class="table-icon">${icon('table')}</div>
+      <div class="table-info">
+        <div class="table-name" title="${esc(t.fileName)}">${esc(t.fileName)}</div>
+        <div class="table-sub">${esc(t.sheetName)} · ${t.rows.length} baris · ${t.headers.length} kolom</div>
+      </div>
+      <div class="table-actions">
+        <button class="icon-btn sm" data-act="preview" title="Pratinjau">${icon('eye')}</button>
+        <button class="icon-btn sm danger" data-act="remove" title="Hapus">${icon('x')}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* =========================================================
+   7. RENDER KONFIGURASI RANTAI
+   ========================================================= */
+function renderChain(){
+  const srcSel = $('#sourceTable');
+
+  srcSel.innerHTML = state.tables.length
+    ? state.tables.map(t =>
+        `<option value="${t.id}" ${t.id === state.sourceTableId ? 'selected' : ''}>${esc(t.fileName)} — ${esc(t.sheetName)}</option>`
+      ).join('')
+    : `<option value="">(belum ada tabel)</option>`;
+  srcSel.disabled = !state.tables.length;
+
+  renderSteps();
+}
+
+function renderSteps(){
+  const el = $('#steps');
+
+  if (!state.steps.length){
+    el.innerHTML = `<div class="empty small">Belum ada langkah lookup.<br>Klik <b>＋ Tambah Langkah</b> untuk memulai rantai.</div>`;
+    return;
+  }
+
+  const src = getTable(state.sourceTableId);
+  const srcHeaders = src ? src.headers : [];
+
+  el.innerHTML = state.steps.map((s, i) => {
+    const t = getTable(s.tableId);
+    const cols = t ? t.headers : [];
+
+    const tableOpts = state.tables.map(x =>
+      `<option value="${x.id}" ${x.id === s.tableId ? 'selected' : ''}>${esc(x.fileName)} — ${esc(x.sheetName)}</option>`
+    ).join('');
+
+    const ksVal = s.keySource === 'prev' ? 'prev' : 'src:' + (s.sourceCol || '');
+    const srcOpts = srcHeaders.map(h =>
+      `<option value="src:${esc(h)}" ${ksVal === 'src:' + h ? 'selected' : ''}>${esc(h)}</option>`
+    ).join('');
+
+    const keyOpts = cols.map(c =>
+      `<option value="${esc(c)}" ${c === s.keyCol ? 'selected' : ''}>${esc(c)}</option>`
+    ).join('');
+
+    const retOpts = cols.map(c =>
+      `<option value="${esc(c)}" ${c === s.returnCol ? 'selected' : ''}>${esc(c)}</option>`
+    ).join('');
+
+    const mode = s.matchMode || 'exact';
+
+    return `
+      <div class="step" data-id="${s.id}">
+        <div class="step-top">
+          <div class="step-num">${i + 1}</div>
+          <div class="step-title">Langkah ${i + 1}</div>
+          <button class="icon-btn sm danger" data-act="del-step" title="Hapus langkah">${icon('x')}</button>
+        </div>
+        <div class="step-fields">
+          <label>Tabel tujuan
+            <select data-field="tableId">
+              <option value="">— pilih tabel —</option>
+              ${tableOpts}
+            </select>
+          </label>
+          <label>Nilai kunci berasal dari
+            <select data-field="keySource">
+              <option value="prev" ${ksVal === 'prev' ? 'selected' : ''}>← Hasil langkah sebelumnya</option>
+              <optgroup label="Kolom tabel sumber">
+                ${srcOpts || '<option value="" disabled>(tabel sumber belum dipilih)</option>'}
+              </optgroup>
+            </select>
+          </label>
+          <label>Kolom kunci di tabel tujuan
+            <select data-field="keyCol" ${cols.length ? '' : 'disabled'}>
+              ${keyOpts || '<option value="">(—)</option>'}
+            </select>
+          </label>
+          <label>Mode pencocokan
+            <select data-field="matchMode">
+              <option value="exact" ${mode === 'exact' ? 'selected' : ''}>Persis (sama)</option>
+              <option value="contains" ${mode === 'contains' ? 'selected' : ''}>Kunci mengandung nilai</option>
+              <option value="within" ${mode === 'within' ? 'selected' : ''}>Nilai mengandung kunci</option>
+            </select>
+          </label>
+          <label>Kolom yang diambil
+            <select data-field="returnCol" ${cols.length ? '' : 'disabled'}>
+              ${retOpts || '<option value="">(—)</option>'}
+            </select>
+          </label>
+          <label>Nama kolom output
+            <input type="text" data-field="alias" value="${esc(s.alias || '')}" placeholder="otomatis">
+          </label>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/* =========================================================
+   8. MESIN CHAIN LOOKUP
+   ========================================================= */
+function findValue(step, searchVal){
+  const k = normKey(searchVal);
+  if (k === '') return undefined;
+
+  if (step.matchMode === 'exact'){
+    return step.map.has(k) ? step.map.get(k) : undefined;
+  }
+  for (const item of step.list){
+    if (step.matchMode === 'contains'){
+      if (item.k.includes(k)) return item.v;
+    } else {
+      if (k.includes(item.k)) return item.v;
+    }
+  }
+  return undefined;
+}
+
+function runChain(){
+  const src = getTable(state.sourceTableId);
+  if (!src) return toast('Pilih tabel sumber terlebih dahulu.');
+  if (!state.steps.length) return toast('Tambahkan minimal satu langkah lookup.');
+
+  for (let i = 0; i < state.steps.length; i++){
+    const s = state.steps[i];
+    if (!s.tableId) return toast(`Langkah ${i+1}: pilih tabel tujuan.`);
+    if (s.keySource === 'source' && !s.sourceCol)
+      return toast(`Langkah ${i+1}: pilih kolom sumber.`);
+    if (s.keySource === 'prev' && i === 0)
+      return toast(`Langkah 1 tidak bisa memakai "hasil langkah sebelumnya".`);
+    if (!s.keyCol) return toast(`Langkah ${i+1}: pilih kolom kunci di tabel tujuan.`);
+    if (!s.returnCol) return toast(`Langkah ${i+1}: pilih kolom yang diambil.`);
+  }
+
+  const prepared = state.steps.map(s => {
+    const t = getTable(s.tableId);
+    const map = new Map();
+    const list = [];
+
+    for (const row of t.rows){
+      const k = normKey(row[s.keyCol]);
+      if (k === '') continue;
+      if (s.matchMode === 'exact'){
+        if (!map.has(k)) map.set(k, row[s.returnCol]);
+      } else {
+        list.push({ k, v: row[s.returnCol] });
+      }
+    }
+
+    if (s.matchMode === 'contains'){
+      list.sort((a, b) => a.k.length - b.k.length);
+    } else if (s.matchMode === 'within'){
+      list.sort((a, b) => b.k.length - a.k.length);
+    }
+
+    return { ...s, table: t, map, list, matchCount: 0 };
+  });
+
+  const used = new Set(src.headers);
+  const aliases = prepared.map((s) => {
+    const base = (s.alias || '').trim() || `${s.returnCol} [${s.table.sheetName}]`;
+    return uniqueName(base, used);
+  });
+  const headers = [...src.headers, ...aliases];
+
+  const rows = [];
+  let fullMatch = 0;
+
+  for (const row of src.rows){
+    const out = {};
+    src.headers.forEach(h => { out[h] = row[h]; });
+
+    const stepValues = [];
+    let allMatched = true;
+
+    prepared.forEach((step, i) => {
+      let searchVal = null;
+      let canRun = false;
+
+      if (step.keySource === 'prev'){
+        if (i > 0){
+          searchVal = stepValues[i - 1];
+          canRun = searchVal !== null && searchVal !== undefined && normKey(searchVal) !== '';
+        }
+      } else {
+        searchVal = row[step.sourceCol];
+        canRun = true;
+      }
+
+      let val = null;
+      if (canRun && normKey(searchVal) !== ''){
+        const found = findValue(step, searchVal);
+        if (found !== undefined){
+          val = found;
+          step.matchCount++;
+        }
+      }
+      if (val === null || val === undefined) allMatched = false;
+
+      stepValues.push(val);
+      out[aliases[i]] = val;
+    });
+
+    if (allMatched) fullMatch++;
+    rows.push(out);
+  }
+
+  const stepStats = prepared.map((s, i) => ({
+    index: i,
+    label: s.alias || `${s.returnCol} [${s.table.sheetName}]`,
+    matched: s.matchCount
+  }));
+
+  state.result = { headers, rows, total: src.rows.length, fullMatch, stepStats };
+
+  renderStats();
+  renderResult();
+
+  if (!rows.length) toast('Tabel sumber tidak memiliki baris data.');
+  else toast(`Selesai: ${fullMatch}/${rows.length} baris cocok penuh.`);
+}
+
+/* =========================================================
+   9. RENDER HASIL
+   ========================================================= */
+function tableHTML(headers, rows, withNum){
+  if (!headers.length) return `<div class="empty">Tidak ada kolom.</div>`;
+
+  const head = headers.map(h => `<th>${esc(h)}</th>`).join('');
+  const body = rows.map((r, i) => {
+    const cells = headers.map(h => `<td>${esc(fmt(r[h]))}</td>`).join('');
+    return `<tr>${withNum ? `<td class="rownum">${i + 1}</td>` : ''}${cells}</tr>`;
+  }).join('');
+
+  return `<div class="table-wrap"><table>
+    <thead><tr>${withNum ? '<th class="rownum">#</th>' : ''}${head}</tr></thead>
+    <tbody>${body}</tbody>
+  </table></div>`;
+}
+
+function renderResult(){
+  const area = $('#resultArea');
+
+  if (!state.result){
+    area.innerHTML = `<div class="empty">Belum ada hasil.<br>Atur sumber &amp; langkah, lalu klik <b>Jalankan Lookup</b>.</div>`;
+    return;
+  }
+
+  const { headers, rows, total, fullMatch, stepStats } = state.result;
+  const limit = state.displayLimit;
+  const shown = limit === 0 ? rows.length : Math.min(limit, rows.length);
+  const pct = total ? Math.round(fullMatch / total * 100) : 0;
+
+  area.innerHTML = `
+    <div class="stats">
+      <span class="badge badge-muted">${total} baris sumber</span>
+      <span class="badge badge-success">${fullMatch} cocok penuh (${pct}%)</span>
+      <span class="badge badge-warning">${total - fullMatch} tidak lengkap</span>
+      <span class="badge badge-primary">${headers.length} kolom output</span>
+    </div>
+    ${stepStats && stepStats.length ? `
+      <div class="step-stats">
+        ${stepStats.map(s => `
+          <span class="badge badge-info">Langkah ${s.index + 1} · ${esc(s.label)}: ${s.matched}/${total}</span>
+        `).join('')}
+      </div>` : ''}
+    ${tableHTML(headers, rows.slice(0, shown), true)}
+    ${shown < rows.length
+      ? `<p class="hint" style="margin:10px 0 0">Menampilkan ${shown} dari ${rows.length} baris — file ekspor tetap berisi seluruh baris.</p>`
+      : ''}
+  `;
+}
+
+/* =========================================================
+   10. EXPORT
+   ========================================================= */
+function csvCell(v){
+  const s = fmt(v);
+  return /[",\n\r;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function exportCSV(){
+  if (!state.result) return toast('Belum ada hasil untuk diekspor.');
+  const { headers, rows } = state.result;
+  const lines = [headers.map(csvCell).join(',')];
+  rows.forEach(r => lines.push(headers.map(h => csvCell(r[h])).join(',')));
+
+  const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  download(blob, `chain-lookup-${stamp()}.csv`);
+  toast('CSV berhasil diunduh.');
+}
+
+function exportExcel(){
+  if (!state.result) return toast('Belum ada hasil untuk diekspor.');
+  const { headers, rows } = state.result;
+
+  const aoa = [headers, ...rows.map(r => headers.map(h => {
+    const v = r[h];
+    if (v === null || v === undefined) return '';
+    return v;
+  }))];
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = headers.map(h => ({ wch: Math.min(40, Math.max(12, h.length + 4)) }));
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Hasil');
+  XLSX.writeFile(wb, `chain-lookup-${stamp()}.xlsx`);
+  toast('Excel berhasil diunduh.');
+}
+
+/* =========================================================
+   11. PREVIEW MODAL
+   ========================================================= */
+function openPreview(id){
+  const t = getTable(id);
+  if (!t) return;
+  $('#modalTitle').textContent = `${t.fileName} — ${t.sheetName}  (${t.rows.length} baris)`;
+  $('#modalBody').innerHTML = tableHTML(t.headers, t.rows.slice(0, 300), true) +
+    (t.rows.length > 300
+      ? `<p class="hint" style="margin:12px 0 0">Pratinjau 300 baris pertama dari ${t.rows.length} baris.</p>`
+      : '');
+  $('#modal').classList.add('open');
+}
+
+/* =========================================================
+   12. RENDER ALL
+   ========================================================= */
+function renderAll(){
+  renderStats();
+  renderTables();
+  renderChain();
+}
+
+/* =========================================================
+   13. EVENT BINDING
+   ========================================================= */
+
+/* --- upload --- */
+$('#fileInput').addEventListener('change', e => {
+  if (e.target.files.length) handleFiles(e.target.files);
+  e.target.value = '';
+});
+
+/* --- drag & drop global --- */
+let dragDepth = 0;
+window.addEventListener('dragenter', e => {
+  e.preventDefault();
+  dragDepth++;
+  document.body.classList.add('dragging');
+});
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('dragleave', e => {
+  e.preventDefault();
+  dragDepth = Math.max(0, dragDepth - 1);
+  if (!dragDepth) document.body.classList.remove('dragging');
+});
+window.addEventListener('drop', e => {
+  e.preventDefault();
+  dragDepth = 0;
+  document.body.classList.remove('dragging');
+  if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+});
+
+/* --- daftar tabel --- */
+$('#tablesList').addEventListener('click', e => {
+  const item = e.target.closest('.table-item');
+  if (!item) return;
+  const id = item.dataset.id;
+  const actEl = e.target.closest('[data-act]');
+  const act = actEl ? actEl.dataset.act : null;
+
+  if (act === 'preview'){ openPreview(id); return; }
+
+  if (act === 'remove'){
+    state.tables = state.tables.filter(t => t.id !== id);
+    state.steps.forEach(s => {
+      if (s.tableId === id){
+        s.tableId = '';
+        s.keyCol = '';
+        s.returnCol = '';
+      }
+    });
+    if (state.sourceTableId === id){
+      const first = state.tables[0];
+      state.sourceTableId = first ? first.id : '';
+    }
+    syncSourceCols();
+    state.result = null;
+    renderAll(); renderResult();
+    return;
+  }
+
+  state.sourceTableId = id;
+  syncSourceCols();
+  renderAll();
+});
+
+/* --- sumber --- */
+$('#sourceTable').addEventListener('change', e => {
+  state.sourceTableId = e.target.value;
+  syncSourceCols();
+  renderAll();
+});
+
+/* --- pencarian tabel --- */
+$('#tableSearch').addEventListener('input', e => {
+  state.tableFilter = e.target.value;
+  renderTables();
+});
+
+/* --- tambah langkah --- */
+$('#btnAddStep').addEventListener('click', () => {
+  const src = getTable(state.sourceTableId);
+  const isFirst = state.steps.length === 0;
+  state.steps.push({
+    id: nid('step'),
+    tableId: '',
+    keySource: isFirst ? 'source' : 'prev',
+    sourceCol: isFirst && src ? (src.headers[0] || '') : '',
+    keyCol: '',
+    returnCol: '',
+    matchMode: 'exact',
+    alias: ''
+  });
+  renderStats();
+  renderSteps();
+});
+
+/* --- perubahan field pada langkah --- */
+$('#steps').addEventListener('change', e => {
+  const stepEl = e.target.closest('.step');
+  if (!stepEl) return;
+  const step = state.steps.find(s => s.id === stepEl.dataset.id);
+  if (!step) return;
+
+  const field = e.target.dataset.field;
+
+  if (field === 'tableId'){
+    step.tableId = e.target.value;
+    const t = getTable(step.tableId);
+    step.keyCol = t ? (t.headers[0] || '') : '';
+    step.returnCol = t ? (t.headers[1] || t.headers[0] || '') : '';
+    renderSteps();
+    return;
+  }
+
+  if (field === 'keySource'){
+    const v = e.target.value;
+    if (v === 'prev'){
+      step.keySource = 'prev';
+      step.sourceCol = '';
+    } else if (v.startsWith('src:')){
+      step.keySource = 'source';
+      step.sourceCol = v.slice(4);
+    }
+    return;
+  }
+
+  step[field] = e.target.value;
+});
+
+/* --- alias (input) --- */
+$('#steps').addEventListener('input', e => {
+  if (e.target.dataset.field !== 'alias') return;
+  const stepEl = e.target.closest('.step');
+  const step = state.steps.find(s => s.id === stepEl.dataset.id);
+  if (step) step.alias = e.target.value;
+});
+
+/* --- hapus langkah --- */
+$('#steps').addEventListener('click', e => {
+  if (!e.target.closest('[data-act="del-step"]')) return;
+  const stepEl = e.target.closest('.step');
+  state.steps = state.steps.filter(s => s.id !== stepEl.dataset.id);
+  renderStats();
+  renderSteps();
+});
+
+/* --- aksi hasil --- */
+$('#btnRun').addEventListener('click', runChain);
+$('#btnCSV').addEventListener('click', exportCSV);
+$('#btnXLSX').addEventListener('click', exportExcel);
+
+$('#displayLimit').addEventListener('change', e => {
+  state.displayLimit = Number(e.target.value);
+  renderResult();
+});
+
+/* --- modal --- */
+$('#modalClose').addEventListener('click', () => $('#modal').classList.remove('open'));
+$('#modal').addEventListener('click', e => {
+  if (e.target.id === 'modal') $('#modal').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') $('#modal').classList.remove('open');
+});
+
+/* --- reset --- */
+$('#btnReset').addEventListener('click', () => {
+  if (state.tables.length && !confirm('Hapus semua data yang dimuat?')) return;
+  state.tables = [];
+  state.steps = [];
+  state.sourceTableId = '';
+  state.result = null;
+  state.tableFilter = '';
+  $('#tableSearch').value = '';
+  renderAll();
+  renderResult();
+});
+
+/* =========================================================
+   14. INIT
+   ========================================================= */
+hydrateIcons();
+renderAll();
+renderResult();
+</script>
+</body>
+</html>
