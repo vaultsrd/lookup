@@ -1,18 +1,23 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chain Lookup Studio — Dark</title>
+<title>Chain Lookup Studio — Dark/Light</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 /* =========================================================
-   DESIGN TOKENS — Corona Free Admin dark palette
+   DESIGN TOKENS — Dark & Light palettes
    ========================================================= */
 :root{
+  --radius:8px;
+  --shadow:0 18px 40px -24px rgba(0,0,0,.9);
+}
+
+:root[data-theme="dark"]{
   --bg:#000000;
   --surface:#191c24;
   --surface-2:#2A3038;
@@ -20,19 +25,46 @@
   --border:#2c2e33;
   --zebra-odd:#191c24;
   --zebra-even:#000000;
-
   --text:#ffffff;
   --text-soft:#d7dae2;
   --muted:#6c7293;
-
   --primary:#0090e7;
   --success:#00d25b;
   --warning:#ffab00;
   --danger:#fc424a;
   --info:#8f5fe8;
+  --scroll-thumb:#31353d;
+  --scroll-thumb-hover:#3d424b;
+  --table-head-bg:#0f1117;
+  --table-border:#2c2e33;
+  --modal-backdrop:rgba(0,0,0,.78);
+  --dragging-backdrop:rgba(0,0,0,.78);
+  --hover-row:#2A3038;
+}
 
-  --radius:8px;
-  --shadow:0 18px 40px -24px rgba(0,0,0,.9);
+:root[data-theme="light"]{
+  --bg:#f3f5f9;
+  --surface:#ffffff;
+  --surface-2:#eef1f6;
+  --surface-3:#f7f9fc;
+  --border:#d8dde7;
+  --zebra-odd:#ffffff;
+  --zebra-even:#f6f8fb;
+  --text:#1a1f2b;
+  --text-soft:#3a4152;
+  --muted:#6b7385;
+  --primary:#0077c8;
+  --success:#0f9d58;
+  --warning:#c77800;
+  --danger:#d93025;
+  --info:#6f42c1;
+  --scroll-thumb:#c3cad6;
+  --scroll-thumb-hover:#aab3c2;
+  --table-head-bg:#eef1f6;
+  --table-border:#e2e6ee;
+  --modal-backdrop:rgba(20,24,32,.55);
+  --dragging-backdrop:rgba(20,24,32,.55);
+  --hover-row:#eaf1fb;
 }
 
 *{box-sizing:border-box}
@@ -46,6 +78,7 @@ body{
   font-size:14px;
   line-height:1.5;
   -webkit-font-smoothing:antialiased;
+  transition:background-color .2s, color .2s;
 }
 [id]{scroll-margin-top:24px}
 button,input,select,label{font-family:inherit}
@@ -56,7 +89,7 @@ button,input,select,label{font-family:inherit}
 .ico.xl{width:26px;height:26px}
 
 /* =========================================================
-   APP SHELL — full width, no sidebar / no topbar
+   APP SHELL
    ========================================================= */
 .app{
   width:100%;
@@ -94,9 +127,9 @@ button,input,select,label{font-family:inherit}
 .stat-card{
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
   padding:18px; display:flex; align-items:center; justify-content:space-between; gap:14px;
-  transition:border-color .18s;
+  transition:border-color .18s, background-color .2s;
 }
-.stat-card:hover{border-color:#3a3e46}
+.stat-card:hover{border-color:var(--scroll-thumb-hover)}
 .stat-label{
   margin:0 0 7px; font-size:11px; font-weight:700; letter-spacing:.08em;
   text-transform:uppercase; color:var(--muted);
@@ -112,7 +145,7 @@ button,input,select,label{font-family:inherit}
 .stat-icon.violet{background:rgba(143,95,232,.12); color:var(--info)}
 
 /* =========================================================
-   COLUMNS — proporsional, tidak "pendek"
+   COLUMNS
    ========================================================= */
 .cols{
   display:grid;
@@ -128,6 +161,7 @@ button,input,select,label{font-family:inherit}
 .card{
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
   box-shadow:var(--shadow); overflow:hidden; margin-bottom:18px;
+  transition:background-color .2s, border-color .2s;
 }
 .card-head{
   display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -142,7 +176,6 @@ button,input,select,label{font-family:inherit}
   background:rgba(0,144,231,.14); color:var(--primary); font-size:11.5px; font-weight:700;
 }
 .card-title .ico{color:var(--muted)}
-.card-head .ico{color:var(--muted)}
 .card-body{padding:18px}
 .head-tools{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
 .head-tools .btn{margin:0}
@@ -153,7 +186,7 @@ button,input,select,label{font-family:inherit}
 .search{position:relative}
 .search input{
   width:100%; padding:9px 12px 9px 38px; border-radius:var(--radius);
-  background:var(--surface-2); border:1px solid var(--border); color:#fff; font-size:13px;
+  background:var(--surface-2); border:1px solid var(--border); color:var(--text); font-size:13px;
   outline:none; transition:.15s;
 }
 .search input::placeholder{color:var(--muted)}
@@ -173,13 +206,13 @@ button,input,select,label{font-family:inherit}
 }
 .dropzone:hover{border-color:var(--primary); background:rgba(0,144,231,.06)}
 .dropzone .big{display:grid; place-items:center; margin-bottom:10px; color:var(--primary)}
-.dropzone b{color:#fff}
+.dropzone b{color:var(--text)}
 .dropzone small{display:block; margin-top:6px; font-size:11.5px; color:var(--muted)}
 body.dragging .dropzone{border-color:var(--primary); background:rgba(0,144,231,.1)}
 body.dragging::after{
   content:"Lepaskan file di sini"; position:fixed; inset:0; z-index:100;
   display:grid; place-items:center; font-size:20px; font-weight:700; color:#fff;
-  background:rgba(0,0,0,.78); backdrop-filter:blur(3px); pointer-events:none;
+  background:var(--dragging-backdrop); backdrop-filter:blur(3px); pointer-events:none;
 }
 
 /* =========================================================
@@ -229,16 +262,16 @@ label.field, .step-fields label{
   letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
 }
 select, input[type=text], input[type=number], input[type=search]{
-  width:100%; font-family:inherit; font-size:13px; font-weight:500; color:#fff;
+  width:100%; font-family:inherit; font-size:13px; font-weight:500; color:var(--text);
   background-color:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius);
-  padding:9px 11px; outline:none; transition:border-color .15s, box-shadow .15s;
+  padding:9px 11px; outline:none; transition:border-color .15s, box-shadow .15s, background-color .2s;
 }
 select{
   appearance:none; padding-right:30px; cursor:pointer;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236c7293' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat:no-repeat; background-position:right 11px center;
 }
-select option{background:var(--surface); color:#fff}
+select option{background:var(--surface); color:var(--text)}
 select:focus, input:focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(0,144,231,.2)}
 select:disabled, input:disabled{opacity:.45; cursor:not-allowed}
 input::placeholder{color:var(--muted)}
@@ -256,8 +289,19 @@ input::placeholder{color:var(--muted)}
 .btn.primary{background:var(--primary); color:#fff}
 .btn.primary:hover{filter:brightness(1.12)}
 .btn.outline{background:transparent; border-color:var(--border); color:var(--text-soft)}
-.btn.outline:hover{background:var(--surface-2); color:#fff; border-color:#3a3e46}
+.btn.outline:hover{background:var(--surface-2); color:var(--text); border-color:var(--scroll-thumb-hover)}
 .btn.sm{padding:6px 11px; font-size:12px; border-radius:7px}
+
+/* --- ikon tombol: ikut warna teks tombol agar selalu jelas --- */
+.btn .ico{
+  color:currentColor;
+  stroke-width:2.4;
+}
+.btn.sm .ico{width:14px; height:14px}
+.btn.primary .ico,
+.btn.csv .ico,
+.btn.excel .ico{color:#ffffff}
+.icon-btn .ico{color:currentColor}
 
 /* --- tombol unduh --- */
 .btn.csv{
@@ -278,7 +322,7 @@ input::placeholder{color:var(--muted)}
   border:1px solid transparent; background:transparent; color:var(--muted);
   cursor:pointer; transition:.15s; position:relative;
 }
-.icon-btn:hover{background:var(--surface-2); color:#fff}
+.icon-btn:hover{background:var(--surface-2); color:var(--text)}
 .icon-btn.sm{width:30px; height:30px}
 .icon-btn.danger:hover{background:rgba(252,66,74,.14); color:var(--danger)}
 
@@ -296,27 +340,43 @@ input::placeholder{color:var(--muted)}
 .badge-info{background:rgba(143,95,232,.18); color:#b393f5}
 .badge-muted{background:var(--surface-2); color:#9aa1b5}
 
+/* warna khusus light agar kontras tetap bagus */
+:root[data-theme="light"] .badge-primary{ background:rgba(0,119,200,.12); color:#0064a8; }
+:root[data-theme="light"] .badge-success{ background:rgba(15,157,88,.12); color:#0b7a44; }
+:root[data-theme="light"] .badge-warning{ background:rgba(199,120,0,.12); color:#9a5e00; }
+:root[data-theme="light"] .badge-danger{ background:rgba(217,48,37,.12); color:#b0261f; }
+:root[data-theme="light"] .badge-info{ background:rgba(111,66,193,.12); color:#5a35a3; }
+:root[data-theme="light"] .badge-muted{ background:var(--surface-2); color:#4a5263; }
+:root[data-theme="light"] .btn.csv{ background-color:#6f42c1; border-color:#6f42c1; }
+:root[data-theme="light"] .btn.excel{ background-color:#0f9d58; border-color:#0f9d58; }
+:root[data-theme="light"] .card{ box-shadow:0 10px 30px -22px rgba(20,24,32,.4); }
+:root[data-theme="light"] .brand-mark{ box-shadow:0 10px 22px -12px rgba(0,119,200,.55); }
+:root[data-theme="light"] .stat-icon{ background:rgba(0,119,200,.1); }
+
 /* =========================================================
-   DATA TABLES — zebra grey/black + dark border-top
+   DATA TABLES
    ========================================================= */
 .table-wrap{
   overflow:auto; border:1px solid var(--border); border-radius:var(--radius); max-height:62vh;
-  background:#000000;
+  background:var(--surface);
 }
 table{border-collapse:collapse; width:100%; font-size:12.5px; white-space:nowrap}
 thead th{
-  position:sticky; top:0; z-index:2; background:var(--surface-3); color:var(--muted);
+  position:sticky; top:0; z-index:2; background:var(--table-head-bg); color:var(--muted);
   text-align:left; padding:10px 13px; font-size:10.5px; font-weight:700;
-  letter-spacing:.08em; text-transform:uppercase; border-bottom:1px solid #2c2e33;
+  letter-spacing:.08em; text-transform:uppercase; border-bottom:1px solid var(--table-border);
 }
 tbody td{
   padding:9px 13px; color:var(--text-soft);
-  border-top:1px solid #2c2e33;
+  border-top:1px solid var(--table-border);
   background:var(--zebra-odd);
 }
 tbody tr:nth-child(even) td{ background:var(--zebra-even) }
-tbody tr:hover td{ background:var(--surface-2) }
+tbody tr:hover td{ background:var(--hover-row) }
 td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-variant-numeric:tabular-nums}
+
+/* label keterangan untuk nilai hasil yang kosong */
+tbody td.na{ color:var(--muted); font-style:italic; }
 
 /* =========================================================
    MISC
@@ -334,7 +394,7 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
    ========================================================= */
 .modal{
   position:fixed; inset:0; z-index:120; display:none; align-items:center; justify-content:center;
-  padding:24px; background:rgba(0,0,0,.75); backdrop-filter:blur(2px);
+  padding:24px; background:var(--modal-backdrop); backdrop-filter:blur(2px);
 }
 .modal.open{display:flex}
 .modal-box{
@@ -346,7 +406,7 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
   display:flex; align-items:center; justify-content:space-between; gap:12px;
   padding:14px 18px; border-bottom:1px solid var(--border);
 }
-.modal-head h3{margin:0; font-size:14px; font-weight:600}
+.modal-head h3{margin:0; font-size:14px; font-weight:600; color:var(--text)}
 .modal-body{padding:16px 18px; overflow:auto}
 .modal-body .table-wrap{max-height:none}
 
@@ -357,7 +417,7 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
   position:fixed; left:50%; bottom:26px; z-index:200;
   transform:translateX(-50%) translateY(16px);
   background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--primary);
-  color:#fff; padding:12px 20px; border-radius:var(--radius); font-size:13px;
+  color:var(--text); padding:12px 20px; border-radius:var(--radius); font-size:13px;
   box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:.25s; max-width:90vw;
 }
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
@@ -365,8 +425,8 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
 /* Scrollbars */
 ::-webkit-scrollbar{width:9px;height:9px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:#31353d; border-radius:9px}
-::-webkit-scrollbar-thumb:hover{background:#3d424b}
+::-webkit-scrollbar-thumb{background:var(--scroll-thumb); border-radius:9px}
+::-webkit-scrollbar-thumb:hover{background:var(--scroll-thumb-hover)}
 
 @media(max-width:900px){
   .stat-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
@@ -387,6 +447,9 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
       </div>
     </div>
     <div class="page-actions">
+      <button class="btn outline" id="btnTheme" title="Ganti tema">
+        <span id="themeIcon"></span> <span id="themeLabel">Terang</span>
+      </button>
       <label class="btn primary">
         <span data-ico="plus"></span> Tambah File
         <input type="file" id="fileInput" multiple accept=".xlsx,.xls,.xlsm,.csv" hidden>
@@ -497,7 +560,9 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
             <b>kolom tabel sumber</b> (bebas) atau dari <b>hasil langkah sebelumnya</b>.<br>
             <b>Persis</b> = nilai harus sama; <b>Kunci mengandung nilai</b> = sel tabel tujuan memuat nilai dicari;
             <b>Nilai mengandung kunci</b> = nilai dicari memuat sel tabel tujuan.<br>
-            Pencocokan mengabaikan spasi berlebih &amp; huruf besar/kecil, dan mengambil baris pertama yang cocok.
+            Pencocokan mengabaikan spasi berlebih &amp; huruf besar/kecil, dan mengambil baris pertama yang cocok.<br>
+            Hasil kosong ditandai <b>Tidak ditemukan</b>, <b>Kunci kosong</b>, <b>Tanpa rujukan</b>, atau <b>Kosong</b>
+            agar mudah dibedakan dari data asli.
           </p>
           <div id="steps"></div>
         </div>
@@ -515,6 +580,7 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
               <option value="0">Tampil semua</option>
             </select>
             <button class="btn primary sm" id="btnRun"><span data-ico="play"></span> Jalankan Lookup</button>
+            <button class="btn outline sm" id="btnViewResult"><span data-ico="maximize"></span> Lihat</button>
             <button class="btn csv sm" id="btnCSV"><span data-ico="download"></span> CSV</button>
             <button class="btn excel sm" id="btnXLSX"><span data-ico="download"></span> Excel</button>
           </div>
@@ -526,7 +592,7 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
   </div>
 </div>
 
-<!-- ==================== MODAL PREVIEW ==================== -->
+<!-- ==================== MODAL (Preview & Box View Hasil) ==================== -->
 <div class="modal" id="modal">
   <div class="modal-box">
     <div class="modal-head">
@@ -541,7 +607,7 @@ td.rownum, th.rownum{text-align:right; color:var(--muted); width:1%; font-varian
 
 <script>
 /* =========================================================
-   0. INLINE ICON SET (tanpa dependensi eksternal)
+   0. INLINE ICON SET
    ========================================================= */
 const ICONS = {
   database:'<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/>',
@@ -556,7 +622,10 @@ const ICONS = {
   eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
   x:'<path d="M18 6 6 18M6 6l12 12"/>',
   table:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/>',
-  refresh:'<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>'
+  refresh:'<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+  maximize:'<path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/>'
 };
 
 function icon(name, cls){
@@ -580,10 +649,10 @@ let uidCounter = 0;
 const nid = p => `${p}_${++uidCounter}`;
 
 const state = {
-  tables: [],          // { id, fileName, sheetName, headers[], rows[] }
+  tables: [],
   sourceTableId: '',
-  steps: [],           // { id, tableId, keySource, sourceCol, keyCol, returnCol, alias, matchMode }
-  result: null,        // { headers, rows, total, fullMatch, stepStats[] }
+  steps: [],
+  result: null,
   displayLimit: 500,
   tableFilter: ''
 };
@@ -593,14 +662,80 @@ const state = {
    ========================================================= */
 const $ = sel => document.querySelector(sel);
 
+/* --- Keterangan untuk hasil lookup yang kosong ---
+   Ubah di sini kalau ingin label lain. */
+const EMPTY_LABEL = {
+  noKey:   'Kunci kosong',
+  noMatch: 'Tidak ditemukan',
+  noPrev:  'Tanpa rujukan',
+  blank:   'Kosong'
+};
+const NA_LABELS = new Set(Object.values(EMPTY_LABEL));
+
 const esc = s => String(s ?? '').replace(/[&<>"']/g,
   c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+/* ---- deteksi & format tanggal ---- */
+function isDateLike(v){
+  if (v instanceof Date) return true;
+  if (typeof v === 'string'){
+    return /^\d{4}[-/]\d{1,2}[-/]\d{1,2}/.test(v) ||
+           /^\d{1,2}[-/]\d{1,2}[-/]\d{4}/.test(v);
+  }
+  return false;
+}
+
+function hasTime(v){
+  if (v instanceof Date){
+    return v.getHours() !== 0 || v.getMinutes() !== 0 || v.getSeconds() !== 0;
+  }
+  if (typeof v === 'string'){
+    const m = v.match(/[ T](\d{1,2}):(\d{2})(?::(\d{2}))?/);
+    if (m) return !(m[1] === '00' && m[2] === '00' && (m[3] || '00') === '00');
+  }
+  return false;
+}
+
+function toDate(v){
+  if (v instanceof Date) return v;
+  if (typeof v === 'string'){
+    const s = v.trim();
+    let m = s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+    if (m){
+      return new Date(+m[1], +m[2]-1, +m[3], +(m[4]||0), +(m[5]||0), +(m[6]||0));
+    }
+    m = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+    if (m){
+      return new Date(+m[3], +m[2]-1, +m[1], +(m[4]||0), +(m[5]||0), +(m[6]||0));
+    }
+    const d = new Date(s);
+    if (!isNaN(d)) return d;
+  }
+  return null;
+}
+
+function fmtDateDMY(v){
+  const d = toDate(v);
+  if (!d) return String(v ?? '');
+  return `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`;
+}
+
+function fmtDateTime(v){
+  const d = toDate(v);
+  if (!d) return String(v ?? '');
+  const date = `${pad2(d.getDate())}/${pad2(d.getMonth()+1)}/${d.getFullYear()}`;
+  const hh = d.getHours(), mm = d.getMinutes(), ss = d.getSeconds();
+  if (hh === 0 && mm === 0 && ss === 0) return date;
+  return `${date} ${pad2(hh)}:${pad2(mm)}:${pad2(ss)}`;
+}
+
 function fmt(v){
   if (v === null || v === undefined || v === '') return '';
-  if (v instanceof Date){
-    const p = n => String(n).padStart(2,'0');
-    return `${v.getFullYear()}-${p(v.getMonth()+1)}-${p(v.getDate())}`;
+  if (v instanceof Date) return hasTime(v) ? fmtDateTime(v) : fmtDateDMY(v);
+  if (typeof v === 'string' && isDateLike(v)){
+    return hasTime(v) ? fmtDateTime(v) : fmtDateDMY(v);
   }
   return String(v);
 }
@@ -630,8 +765,8 @@ function uniqueName(base, used){
 }
 
 function stamp(){
-  const d = new Date(), p = n => String(n).padStart(2,'0');
-  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+  const d = new Date();
+  return `${d.getFullYear()}${pad2(d.getMonth()+1)}${pad2(d.getDate())}-${pad2(d.getHours())}${pad2(d.getMinutes())}`;
 }
 
 function download(blob, filename){
@@ -972,31 +1107,48 @@ function runChain(){
     let allMatched = true;
 
     prepared.forEach((step, i) => {
-      let searchVal = null;
-      let canRun = false;
+      let val = null;
+      let status = 'noMatch';
 
       if (step.keySource === 'prev'){
-        if (i > 0){
-          searchVal = stepValues[i - 1];
-          canRun = searchVal !== null && searchVal !== undefined && normKey(searchVal) !== '';
+        if (i === 0){
+          status = 'noPrev';
+        } else {
+          const prev = stepValues[i - 1];
+          if (prev === null || prev === undefined || normKey(prev) === ''){
+            status = 'noPrev';
+          } else {
+            const found = findValue(step, prev);
+            if (found !== undefined){ val = found; step.matchCount++; status = 'ok'; }
+            else status = 'noMatch';
+          }
         }
       } else {
-        searchVal = row[step.sourceCol];
-        canRun = true;
-      }
-
-      let val = null;
-      if (canRun && normKey(searchVal) !== ''){
-        const found = findValue(step, searchVal);
-        if (found !== undefined){
-          val = found;
-          step.matchCount++;
+        const key = row[step.sourceCol];
+        if (normKey(key) === ''){
+          status = 'noKey';
+        } else {
+          const found = findValue(step, key);
+          if (found !== undefined){ val = found; step.matchCount++; status = 'ok'; }
+          else status = 'noMatch';
         }
       }
-      if (val === null || val === undefined) allMatched = false;
 
+      /* nilai mentah untuk rantai berikutnya */
       stepValues.push(val);
-      out[aliases[i]] = val;
+
+      /* nilai tampilan: ganti kosong dengan keterangan */
+      if (status === 'ok'){
+        if (val === null || val === undefined || String(val).trim() === ''){
+          allMatched = false;
+          out[aliases[i]] = EMPTY_LABEL.blank;
+        } else {
+          out[aliases[i]] = val;
+        }
+      } else {
+        allMatched = false;
+        out[aliases[i]] = EMPTY_LABEL[status];
+      }
     });
 
     if (allMatched) fullMatch++;
@@ -1026,7 +1178,11 @@ function tableHTML(headers, rows, withNum){
 
   const head = headers.map(h => `<th>${esc(h)}</th>`).join('');
   const body = rows.map((r, i) => {
-    const cells = headers.map(h => `<td>${esc(fmt(r[h]))}</td>`).join('');
+    const cells = headers.map(h => {
+      const v = r[h];
+      const isNA = typeof v === 'string' && NA_LABELS.has(v);
+      return `<td${isNA ? ' class="na"' : ''}>${esc(fmt(v))}</td>`;
+    }).join('');
     return `<tr>${withNum ? `<td class="rownum">${i + 1}</td>` : ''}${cells}</tr>`;
   }).join('');
 
@@ -1064,13 +1220,41 @@ function renderResult(){
       </div>` : ''}
     ${tableHTML(headers, rows.slice(0, shown), true)}
     ${shown < rows.length
-      ? `<p class="hint" style="margin:10px 0 0">Menampilkan ${shown} dari ${rows.length} baris — file ekspor tetap berisi seluruh baris.</p>`
+      ? `<p class="hint" style="margin:10px 0 0">Menampilkan ${shown} dari ${rows.length} baris — klik <b>Lihat</b> untuk box view, dan file ekspor tetap berisi seluruh baris.</p>`
       : ''}
   `;
 }
 
 /* =========================================================
-   10. EXPORT
+   10. BOX VIEW HASIL (modal penuh)
+   ========================================================= */
+function openResultView(){
+  if (!state.result) return toast('Belum ada hasil. Jalankan lookup terlebih dahulu.');
+  const { headers, rows, total, fullMatch, stepStats } = state.result;
+  const pct = total ? Math.round(fullMatch / total * 100) : 0;
+
+  $('#modalTitle').textContent = `Hasil Lookup — ${rows.length} baris`;
+  $('#modalBody').innerHTML = `
+    <div class="stats">
+      <span class="badge badge-muted">${total} baris sumber</span>
+      <span class="badge badge-success">${fullMatch} cocok penuh (${pct}%)</span>
+      <span class="badge badge-warning">${total - fullMatch} tidak lengkap</span>
+      <span class="badge badge-primary">${headers.length} kolom output</span>
+    </div>
+    ${stepStats && stepStats.length ? `
+      <div class="step-stats">
+        ${stepStats.map(s => `
+          <span class="badge badge-info">Langkah ${s.index + 1} · ${esc(s.label)}: ${s.matched}/${total}</span>
+        `).join('')}
+      </div>` : ''}
+    ${tableHTML(headers, rows, true)}
+    <p class="hint" style="margin:12px 0 0">Menampilkan seluruh ${rows.length} baris. Gunakan tombol <b>Tutup</b> untuk menutup box view.</p>
+  `;
+  $('#modal').classList.add('open');
+}
+
+/* =========================================================
+   11. EXPORT
    ========================================================= */
 function csvCell(v){
   const s = fmt(v);
@@ -1092,13 +1276,44 @@ function exportExcel(){
   if (!state.result) return toast('Belum ada hasil untuk diekspor.');
   const { headers, rows } = state.result;
 
-  const aoa = [headers, ...rows.map(r => headers.map(h => {
-    const v = r[h];
-    if (v === null || v === undefined) return '';
-    return v;
-  }))];
+  const aoa = [headers];
+  rows.forEach(r => {
+    aoa.push(headers.map(h => {
+      const v = r[h];
+      if (v === null || v === undefined) return '';
+      if (v instanceof Date) return v;
+      if (typeof v === 'string' && isDateLike(v)){
+        const d = toDate(v);
+        if (d) return d;
+      }
+      return v;
+    }));
+  });
 
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  const ws = XLSX.utils.aoa_to_sheet(aoa, { cellDates: true });
+
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let c = range.s.c; c <= range.e.c; c++){
+    let sawTime = false, sawDate = false;
+    for (let r = 1; r <= Math.min(range.e.r, 20); r++){
+      const cell = ws[XLSX.utils.encode_cell({ r, c })];
+      if (cell && cell.t === 'd'){
+        sawDate = true;
+        const d = cell.v;
+        if (d.getHours() || d.getMinutes() || d.getSeconds()) sawTime = true;
+      }
+    }
+    if (sawDate){
+      for (let r = 1; r <= range.e.r; r++){
+        const ref = XLSX.utils.encode_cell({ r, c });
+        const cell = ws[ref];
+        if (cell && cell.t === 'd'){
+          cell.z = sawTime ? 'dd/mm/yyyy hh:mm:ss' : 'dd/mm/yyyy';
+        }
+      }
+    }
+  }
+
   ws['!cols'] = headers.map(h => ({ wch: Math.min(40, Math.max(12, h.length + 4)) }));
 
   const wb = XLSX.utils.book_new();
@@ -1108,7 +1323,7 @@ function exportExcel(){
 }
 
 /* =========================================================
-   11. PREVIEW MODAL
+   12. PREVIEW MODAL
    ========================================================= */
 function openPreview(id){
   const t = getTable(id);
@@ -1122,7 +1337,7 @@ function openPreview(id){
 }
 
 /* =========================================================
-   12. RENDER ALL
+   13. RENDER ALL
    ========================================================= */
 function renderAll(){
   renderStats();
@@ -1131,8 +1346,27 @@ function renderAll(){
 }
 
 /* =========================================================
-   13. EVENT BINDING
+   14. TEMA (dark / light)
    ========================================================= */
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  const isDark = theme === 'dark';
+  const iconEl = $('#themeIcon');
+  const labelEl = $('#themeLabel');
+  if (iconEl) iconEl.innerHTML = icon(isDark ? 'sun' : 'moon');
+  if (labelEl) labelEl.textContent = isDark ? 'Terang' : 'Gelap';
+  try { localStorage.setItem('cls-theme', theme); } catch(e){}
+}
+
+/* =========================================================
+   15. EVENT BINDING
+   ========================================================= */
+
+/* --- tema --- */
+$('#btnTheme').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+});
 
 /* --- upload --- */
 $('#fileInput').addEventListener('change', e => {
@@ -1277,6 +1511,7 @@ $('#steps').addEventListener('click', e => {
 
 /* --- aksi hasil --- */
 $('#btnRun').addEventListener('click', runChain);
+$('#btnViewResult').addEventListener('click', openResultView);
 $('#btnCSV').addEventListener('click', exportCSV);
 $('#btnXLSX').addEventListener('click', exportExcel);
 
@@ -1285,14 +1520,8 @@ $('#displayLimit').addEventListener('change', e => {
   renderResult();
 });
 
-/* --- modal --- */
+/* --- modal: HANYA tombol Tutup yang menutup --- */
 $('#modalClose').addEventListener('click', () => $('#modal').classList.remove('open'));
-$('#modal').addEventListener('click', e => {
-  if (e.target.id === 'modal') $('#modal').classList.remove('open');
-});
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') $('#modal').classList.remove('open');
-});
 
 /* --- reset --- */
 $('#btnReset').addEventListener('click', () => {
@@ -1308,8 +1537,14 @@ $('#btnReset').addEventListener('click', () => {
 });
 
 /* =========================================================
-   14. INIT
+   16. INIT
    ========================================================= */
+(function initTheme(){
+  let t = 'dark';
+  try { t = localStorage.getItem('cls-theme') || 'dark'; } catch(e){}
+  applyTheme(t);
+})();
+
 hydrateIcons();
 renderAll();
 renderResult();
